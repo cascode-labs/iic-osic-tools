@@ -1,22 +1,41 @@
 # IIC-OSIC-TOOLS
 
-**This environment is based on the efabless.com FOSS-ASIC-TOOLS <https://github.com/efabless/foss-asic-tools>**
+This environment is based on the [efabless.com FOSS-ASIC-TOOLS](https://github.com/efabless/foss-asic-tools).
 
-IIC-OSIC-TOOLS is an all-in-one Docker container for open-source-based integrated circuit designs for analog and digital circuit flows. The CPU architectures `x86_64/amd64` and `aarch64/arm64` are natively supported based on Ubuntu LTS (since `2022.12`). This collection of tools is curated by the **Institute for Integrated Circuits (IIC), Johannes Kepler University (JKU)**.
+**IIC-OSIC-TOOLS** is an all-in-one Docker container for open-source-based integrated circuit designs for analog and digital circuit flows. The CPU architectures `x86_64/amd64` and `aarch64/arm64` are natively supported based on Ubuntu 22.04LTS (since release `2022.12`). This collection of tools is curated by the [**Institute for Integrated Circuits (IIC), Johannes Kepler University (JKU)**](https://iic.jku.at).
+
 It supports two *modes of operation*:
 
-1. Using a complete desktop environment (XFCE) in Xvnc (a VNC server), either directly accessing it with a VNC client of your choice or the integrated [noVNC](https://novnc.com) server that runs now in your browser.
+1. Using a complete desktop environment (XFCE) in `Xvnc` (a VNC server), either directly accessing it with a VNC client of your choice or the integrated [noVNC](https://novnc.com) server that runs in your browser.
 2. Using a local X11 server and directly showing the application windows on your desktop.
+
+## How to Use These Open-Source (and Free) IC Design Tools
+
+### Step 1: Clone/download this GitHub repository onto your computer
+
+Use the green **Code** button, and either download the zip file or do a `git clone --depth=1 https://github.com/iic-jku/iic-osic-tools.git`.
+
+### Step 2: Install Docker on your computer
+
+See instructions on how to do this in the section [**Quick Launch for Designers**](#quick-launch-for-designers) further down in this `README`.
+
+### Step 3: Start and Use a Docker Container based on our IIC-OSIC-TOOLS Image
+
+Enter the directory of this repository on your computer, and use one of the methods described in the section [**Quick Launch for Designers**](#quick-launch-for-designers) to start up and run a Docker container based on our image. The easiest way is probably to use the **VNC** mode.
+
+If you do this the first time, or we have pushed an updated image to DockerHub, this can take a while since the image is pulled (loaded) automatically from DockerHub. Since this image is ca. 4GB, this takes time, depending on your internet speed. Please note that this compressed image will be extracted on your drive, so please provide at least **20GB of free drive space**. If, after a while, the consumed space gets larger, this is maybe due to unused images piling up. In this case, delete old ones; please consult the internet for instructions on operating Docker.
+
+If you know what you are doing and want full root access without a graphical interface, please use `./start_shell.sh`.
 
 ## Installed PDKs
 
 As of the `2022.12` tag, the following open-source process-development kits (PDKs) are pre-installed, and the table shows how to switch by setting environment variables (you can do this per project by putting this into `.designinit` as explained below):
 
-| SkyWater Technologies `sky130A` (default) | `sky130B` |
-|---|---|
-| `export PDK=sky130A` | `export PDK=sky130B` |
-| `export PDKPATH=$PDK_ROOT/$PDK` | `export PDKPATH=$PDK_ROOT/$PDK` |
-| `export STD_CELL_LIBRARY=sky130_fd_sc_hd` | `export STD_CELL_LIBRARY=sky130_fd_sc_hd` |
+| SkyWater Technologies `sky130A` |
+|---|
+| `export PDK=sky130A` |
+| `export PDKPATH=$PDK_ROOT/$PDK` |
+| `export STD_CELL_LIBRARY=sky130_fd_sc_hd` |
 
 | Global Foundries `gf180mcuC` |
 |---|
@@ -24,51 +43,70 @@ As of the `2022.12` tag, the following open-source process-development kits (PDK
 | `export PDKPATH=$PDK_ROOT/$PDK` |
 | `export STD_CELL_LIBRARY=gf180mcu_fd_sc_mcu7t5v0` |
 
+| IHP Microelectronics `sg13g2` |
+|---|
+| Not yet ready to use |
+
 More options for selecting digital standard cell libraries are available; please check the PDK directories.
 
 ## Installed Tools
 
 Below is a list of the current tools already installed and ready to use (note there are some adaptions in our container vs. efabless.com):
 
+* [align](https://github.com/ALIGN-analoglayout/ALIGN-public) automatic layout generation for analog circuits (only on `amd64` and for `sky130` PDK)
 * [amaranth](https://github.com/amaranth-lang/amaranth) a Python-based HDL toolchain
 * [cocotb](https://github.com/cocotb/cocotb) simulation library for writing VHDL and Verilog test benches in Python
 * [covered](https://github.com/hpretl/verilog-covered) Verilog code coverage
 * [cvc](https://github.com/d-m-bailey/cvc) circuit validity checker (ERC)
+* [edalize](https://github.com/olofk/edalize) Python abstraction library for EDA tools
 * [fault](https://github.com/Cloud-V/Fault) design-for-test (DFT) solution
+* [fusesoc](https://github.com/olofk/fusesoc) package manager and build tools for SoC
 * [gaw3-xschem](https://github.com/StefanSchippers/xschem-gaw.git) waveform plot tool for `xschem`
 * [gdsfactory](https://github.com/gdsfactory/gdsfactory) Python library for GDS generation
 * [gdspy](https://github.com/heitzmann/gdspy) Python module for creation and manipulation of GDS files
+* [gds3d](https://github.com/trilomix/GDS3D) a 3D viewer for GDS files
+* [gf180mcu](https://github.com/google/gf180mcu-pdk) GlobalFoundries 180nm CMOS PDK
 * [ghdl](https://github.com/ghdl/ghdl) VHDL simulator
 * [gtkwave](https://github.com/gtkwave/gtkwave) waveform plot tool for digital simulation
-* [iic-osic](https://github.com/hpretl/iic-osic.git) collection of useful scripts and documentation
+* [sg13g2](https://github.com/IHP-GmbH/IHP-Open-PDK) IHP Microelectronics 130nm SiGe:C BiCMOS PDK (partial PDK, not fully supported yet; `xschem` and `ngspice` simulation works incl. PSP MOSFET model)
 * [irsim](https://github.com/rtimothyedwards/irsim) switch-level digital simulator
 * [iverilog](https://github.com/steveicarus/iverilog.git) Verilog simulator
-* [klayout](https://github.com/KLayout/klayout) layout tool
-* [magic](https://github.com/rtimothyedwards/magic) layout tool with DRC and PEX
-* [netlistsvg](https://github.com/nturley/netlistsvg) draws SVG netlist from yosys JSON netlist
+* [hdl21](https://github.com/dan-fritchman/Hdl21) Analog hardware description library
+* [klayout](https://github.com/KLayout/klayout) layout viewer and editor for GDS and OASIS
+* [magic](https://github.com/rtimothyedwards/magic) layout editor with DRC and PEX
+* [netlistsvg](https://github.com/nturley/netlistsvg) draws SVG netlist from a `yosys` JSON netlist
 * [netgen](https://github.com/rtimothyedwards/netgen) netlist comparison (LVS)
-* [ngspice](http://ngspice.sourceforge.net) SPICE analog simulator
+* [ngspice](http://ngspice.sourceforge.net) SPICE analog and mixed-signal simulator, with OSDI support
+* [ngspyce](https://github.com/ignamv/ngspyce) Python bindings for `ngspice`
 * [nvc](https://github.com/nickg/nvc) VHDL simulator and compiler
 * [open_pdks](https://github.com/RTimothyEdwards/open_pdks) PDK setup scripts
 * [openlane](https://github.com/The-OpenROAD-Project/OpenLane) digital RTL2GDS flow
-* [openroad](https://github.com/The-OpenROAD-Project/OpenROAD.git) collection of tools for `openlane`
-* [opensta](https://github.com/The-OpenROAD-Project/OpenSTA) static timing analyzer for digital flow
+* [openlane2](https://github.com/efabless/openlane2) rewrite of OpenLane in Python, 2nd generation
+* [openram](https://github.com/VLSIDA/OpenRAM) OpenRAM Python library
+* [openroad](https://github.com/The-OpenROAD-Project/OpenROAD.git) RTL2GDS engine used by `openlane` and `openlane2`
+* [osic-multitool](https://github.com/iic-jku/osic-multitool.git) collection of useful scripts and documentation
 * [padring](https://github.com/donn/padring) padring generation tool
+* [pyopus](https://fides.fe.uni-lj.si/pyopus/index.html) simulation runner and optimization tool for analog circuits
 * [pyrtl](https://github.com/UCSBarchlab/PyRTL) collection of classes for pythonic RTL design
 * [pyspice](https://github.com/PySpice-org/PySpice) interface `ngspice` and `xyce` from Python
 * [pyverilog](https://github.com/PyHDI/Pyverilog) Python toolkit for Verilog
+* RF toolkit with [FastHenry2](https://github.com/ediloren/FastHenry2), [FasterCap](https://github.com/ediloren/FasterCap), [openEMS](https://github.com/thliebig/openEMS), and [scikit-rf](https://github.com/scikit-rf/scikit-rf).
+* [qucs-s](https://github.com/ra3xdh/qucs_s) simulation environment with RF emphasis
 * [rggen](https://github.com/rggen/rggen) code generation tool for configuration and status registers
 * [spyci](https://github.com/gmagno/spyci) analyze/plot `ngspice`/`xyce` output data with Python
+* [slang](https://github.com/MikePopoloski/slang) SystemVerilog parsing and translation (e.g. to Verilog)
 * [vlog2verilog](https://github.com/RTimothyEdwards/qflow.git) Verilog file conversion
+* [volare](https://github.com/efabless/volare) version manager (and builder) for open-source PDKs
 * [risc-v toolchain](https://github.com/riscv/riscv-gnu-toolchain) GNU compiler toolchain for RISC-V RV32I cores
 * [siliconcompiler](https://github.com/siliconcompiler/siliconcompiler) modular build system for hardware
 * [sky130](https://github.com/google/skywater-pdk.git) SkyWater Technologies 130nm CMOS PDK
 * [verilator](https://github.com/verilator/verilator) fast Verilog simulator
+* [vlsirtools](https://github.com/Vlsir/Vlsir) Interchange formats for chip design.
 * [xschem](https://github.com/StefanSchippers/xschem.git) schematic editor
 * [xyce](https://github.com/Xyce/Xyce.git) fast parallel SPICE simulator (incl. `xdm` netlist conversion tool)
-* [yosys](https://github.com/YosysHQ/yosys) Verilog synthesis tool (with GHDL plugin for VHDL synthesis)
+* [yosys](https://github.com/YosysHQ/yosys) Verilog synthesis tool (with GHDL plugin for VHDL synthesis), incl. `eqy` (equivalence checker), `sby` (formal verification), and `mcy` (mutation coverage)
 
-The tool versions used for `OpenLane` are documented in `tool_metadata.yml` and the other tools in `tool_metadata_add.yml`.
+The tool versions used for `OpenLane` are documented in `tool_metadata.yml` and the other tools in `tool_metadata_add.yml`. In addition to the EDA tools above, further valuable tools (like `git`) and editors (like `gvim`) are installed. If something useful is missing, please let us know!
 
 ## Quick Launch for Designers
 
@@ -81,7 +119,7 @@ Download and install **Docker** for your operating system:
 
 Note for Linux: Do not run docker commands or the start scripts as root (`sudo`)! Follow the instructions in [Post-installation steps for Linux](https://docs.docker.com/engine/install/linux-postinstall/)
 
-The following start scripts are intended as helper scripts for local or small-scale (single instance) deployment. If you need to run a bulk of instances, consider starting the containers with a custom start script.
+The following start scripts are intended as helper scripts for local or small-scale (single instance) deployment. Consider starting the containers with a custom start script if you need to run many instances.
 
 ### Customizing Environment
 
@@ -93,22 +131,26 @@ If a file `.designinit` is put in this directory, it is sourced last when starti
 
 This mode is recommended for remote operation on a separate server or if you prefer the convenience of a full desktop environment. To start it up, you can use (in a Bash/Unix shell):
 
-`./start_vnc.sh`
+```bash
+./start_vnc.sh
+```
 
 On Windows, you can use the equivalent batch script (if the defaults are acceptable, it can also be started by double-clicking in Explorer):
 
-`.\start_vnc.bat`
+```terminal
+.\start_vnc.bat
+```
 
 You can now access the Desktop Environment through your browser ([http://localhost](http://localhost)). The default password is `abc123`.
 
 #### Variables for VNC
 
-Both scripts will use default settings, which you can tweak by settings shell variables (VARIABLE=default is shown):
+Both scripts will use default settings, which you can tweak by settings shell variables (`VARIABLE=default` is shown):
 
-* `DRY_RUN` (unset by default); if set to any value (also 0, false, etc.), the start scripts print all executed commands instead of running. Useful for debugging/testing or just creating "template commands" for unique setups.
+* `DRY_RUN` (unset by default); if set to any value (also `0`, `false`, etc.), the start scripts print all executed commands instead of running. Useful for debugging/testing or just creating "template commands" for unique setups.
 * `DESIGNS=$HOME/eda/designs` (`DESIGNS=%USERPROFILE%\eda\designs` for `.bat`) sets the directory that holds your design files. This directory is mounted into the container on `/foss/designs`.
 * `WEBSERVER_PORT=80` sets the port on which the Docker daemon will map the webserver port of the container to be reachable from localhost and the outside world. `0` disables the mapping.
-* `VNC_PORT=5901` sets the port on which the Docker daemon will map the VNC server port of the container to be reachable from localhost and the outside world. This is only required if you want to access the UI with a different VNC client. `0` disabled the mapping.
+* `VNC_PORT=5901` sets the port on which the Docker daemon will map the VNC server port of the container to be reachable from localhost and the outside world. This is only required to access the UI with a different VNC client. `0` disabled the mapping.
 * `DOCKER_USER="hpretl"` username for the Docker Hub repository from which the images are pulled. Usually, no change is required.
 * `DOCKER_IMAGE="iic-osic-tools"` Docker Hub image name to pull. Usually, no change is required.
 * `DOCKER_TAG="latest"` Docker Hub image tag. By default, it pulls the latest version; this might be handy to change if you want to match a specific version set.
@@ -122,36 +164,40 @@ To overwrite the default settings, see [Overwriting Shell Variables](#overwritin
 
 This mode is recommended if the container is run on the local machine. It is significantly faster than VNC (as it renders the graphics locally), is more lightweight (no complete desktop environment is running), and integrates with the desktop (copy-paste, etc.). To start the container, run the following:
 
-`./start_x.sh`
+```bash
+./start_x.sh
+```
 
 or
 
-`.\start_x.bat`
+```terminal
+.\start_x.bat
+```
 
 **Attention Windows and macOS users:** The X-server connection is automatically killed if there is a too-long idle period in the terminal (when this happens, it looks like a **crash** of the system). A **workaround** is to start a second terminal from the initial terminal that pops up when executing the start scripts `./start_x.sh` or `.\start_x.bat` and then start `htop` in the initial terminal. In this way, there is an ongoing display activity in the initial terminal, and as a positive side-effect, the usage of the machine can be monitored. We are looking for a better long-term solution.
 
-**Attention macOS users:** Please make sure to disable the *Enable VirtioFS accelerated directory sharing* setting available as "Beta Setting," as this will cause issues accessing the mounted drives! However, enabling the *VirtioFS* general setting works in Docker >v4.15.0!
+**Attention macOS users:** Please disable the *Enable VirtioFS accelerated directory sharing* setting available as "Beta Setting," as this will cause issues accessing the mounted drives! However, enabling the *VirtioFS* general setting works in Docker >v4.15.0!
 
 #### Variables for X11
 
 The following environment variables are used for configuration:
 
-* `DRY_RUN` (unset by default), if set to any value (also 0, false, etc.), makes the start scripts print all executed commands instead of running. Useful for debugging/testing or just creating "template commands" for unique setups.
+* `DRY_RUN` (unset by default), if set to any value (also `0`, `false`, etc.), makes the start scripts print all executed commands instead of running. Useful for debugging/testing or just creating "template commands" for unique setups.
 * `DESIGNS=$HOME/eda/designs` (`DESIGNS=%USERPROFILE%\eda\designs` for `.bat`) sets the directory that holds your design files. This directory is mounted into the container on `/foss/designs`.
 * `DOCKER_USER="hpretl"` username for the Docker Hub repository from which the images are pulled. Usually, no change is required.
 * `DOCKER_IMAGE="iic-osic-tools"` Docker Hub image name to pull. Usually, no change is required.
 * `DOCKER_TAG="latest"` Docker Hub image tag. By default, it pulls the latest version; this might be handy to change if you want to match a specific Version set.
-* `CONTAINER_USER=$(id -u)` (the current user's ID, `CONTAINER_USER=1000` for `.bat`) The user ID (and also group ID) is especially important on Linux and macOS because those are the IDs used to write files in the DESIGNS directory.
+* `CONTAINER_USER=$(id -u)` (the current user's ID, `CONTAINER_USER=1000` for `.bat`) The user ID (and also group ID) is especially important on Linux and macOS because those are the IDs used to write files in the `DESIGNS` directory.
 * `CONTAINER_GROUP=$(id -g)` (the current user's group ID, `CONTAINER_GROUP=1000` for `.bat`)
 * `CONTAINER_NAME="iic-osic-tools_xserver_uid_"$(id -u)` (attaches the executing user's id to the name on Unix, or only `CONTAINER_NAME="iic-osic-tools_xserver` for `.bat`) is the name that is assigned to the container for easy identification. It is used to identify if a container exists and is running.
 
 #### macOS and Windows-specific Variables
 
-For Mac and Windows, the X11 server is accessed through TCP (:0, aka port 6000). To control the server's address, you can set the following variable:
+For Mac and Windows, the X11 server is accessed through TCP (`:0`, aka port 6000). To control the server's address, you can set the following variable:
 
 * `DISP=host.docker.internal:0` is the environment variable that is copied into the `DISPLAY` variable of the container. `host.docker.internal` resolves to the host's IP address inside the docker containers, `:0` corresponds to display 0 which corresponds to TCP port 6000.
 
-If the executable `xauth` is in `PATH`, the startup script automatically disables access control for localhost, so the X11 server is open for connections from the container. If not, a warning will be shown, and you will have to disable access control.
+If the executable `xauth` is in `PATH`, the startup script automatically disables access control for localhost, so the X11 server is open for connections from the container. A warning will be shown if not, and you must disable access control.
 
 #### Linux-specific Variables
 
@@ -208,72 +254,15 @@ SET DOCKER_USERNAME=another_user
 .\start_x.bat
 ```
 
-## Details for Developers and Contributors
 
-### Prerequisites
+## Support with Issues/Problems/Bugs
 
-* [Docker](https://docs.docker.com/engine/install/)
+We are open for your questions with this container and are very thankful for inputs! If you run into a problem and you are sure it is a bug, please let us know by following this routine:
 
-### Building the container
+ * Take a look in the [KNOWN_ISSUES](KNOWN_ISSUES.md) and the [RELEASE_NOTES](RELEASE_NOTES.md). Both this files can include problems that we are already aware of and maybe include a workaround.
+ * Check the existing [Issues](https://github.com/iic-jku/IIC-OSIC-TOOLS/issues) on Github and see if the problem has been reported already. If yes, please participate in the discussion and help by further collecting information.
+ * Is the problem in connection with the container, or rather a problem with a specific tool? If it is the second, please also checkout the sources of the tool and further contact the maintainer!
+ * To help us fix the problem, please open an issue on Github and report the error. Please give us as much information as possible without being unneedingly verbose, so filter accordingly. It is also fine to open an issue with very little information, we will help you to narrow down the source of the error.
+ * Finally, if you can exactly know how to fix the reported error, we are also happy if you open a pull request with a fix!
 
-The installation slightly differs from the original `foss-asic-tools` installation by efabless.com. For this image, the build is replaced with a single Dockerfile for convenience when doing a multi-architecture build. For a basic single (native)-architecture build, just run the following:
-
-`docker build .`
-
-You can add build parameters accordingly. We strongly recommend using `docker buildx` because of `buildkit` (parallel building) and multi-architecture support. The script `build_all.sh` includes building with `buildx`, on two different machines (for fast amd64 and arm64 builds) and pushes both images to the Docker Hub under the same tag. The script includes multiple environment variables with defaults. If you intend to build this image, we encourage you to use this script as a template.
-The predefined settings are for the IIC build machines, and the image gets pushed with the tags `latest` and `year.month` (e.g., `2022.12`).
-
-### Detailed container settings
-
-For specific use cases, the containers can be started without the help of the start scripts. Here are a few things to note down:
-
-#### Environment Variables
-
-The container makes use of several environment variables to control the behavior. **WARNING:** those values maybe impact the functionality of the container. Do not change them unless you know what you are doing.
-
-The internal VNC and webserver ports are defined by environment variables (not to be confused with the variables in the start script, those manage the external ports, to which the Docker daemon maps the ports! It works *best* if those are matched.). Those are used in the Dockerfile for the exposed ports and the configuration of the services.
-
-* `VNC_PORT=5901` The default internal VNC port.
-* `NO_VNC_PORT=80` The default internal webserver port.
-
-Furthermore, the following variables can be set:
-
-* `HOME=/headless` sets the home directory in the container.
-* `TERM=xterm` is the default graphical terminal emulator.
-* `STARTUPDIR=/dockerstartup` is the directory in which all container-related scripts are put.
-* `NO_VNC_HOME=/dockerstartup/noVNC` is the directory for the noVNC installation.
-* `VNC_COL_DEPTH=24` VNC color resolution.
-* `VNC_RESOLUTION=1680x1050` VNC display resolution. NOTE: This can also be changed while running in the Desktop environment by going to Settings->Display.
-* `VNC_PW=abc123` Default VNC password.
-* `VNC_VIEW_ONLY=false` can set the VNC server to view only.
-* `DESIGNS=/foss/designs` Default directory, where the user's designs are placed.
-* `TOOLS=/foss/tools` Default tools directory.
-* `PDK_ROOT=/foss/pdks` Default PDKs directory.
-
-#### Entrypoint script
-
-The entry point for this container is the [ui_startup.sh](https://github.com/hpretl/iic-osic-tools/blob/main/images/iic-osic-tools/scripts/ui_startup.sh) script. It controls which kind of UI (Xvnc or connecting to local X11 server) is used. The control logic for the automatic mode is simple. If the environment variable `DISPLAY` is set, an already existing X11 server is assumed, and the startup script runs an XFCE4 terminal. If the `DISPLAY` is not set, it starts Xvnc and the noVNC web interface. This behavior can be overwritten with command-line arguments.
-
-The following command line arguments are supported:
-
-* `-X, --x11` Force to use local X11 forwarding requires a working combination of `$DISPLAY`, and either port forwards or mounted `XAUTHORITY` and `.X11_unix` socket.
-* `-V, --vnc` Force use of VNC server, with noVNC and `websockify`.
-* `-w, --wait` Runs the selected UI and waits for them to exit. The script will only return then. This flag is set in the container per default (via `CMD` in the Dockerfile).
-* `-s, --skip` Skip the UI startup and execute the assigned command. **WARNING:** This must be the first parameter to the script, or it must be ignored! Example: `docker run hpretl/iic-osic-tools --skip bash`
-* `-d, --debug` Enables more detailed startup output, e.g., `docker run hpretl/iic-osic-tools --debug`
-
-As some examples already show, these parameters can be passed to the container via Docker:
-
-`docker run -it hpretl/iic-osic-tools:latest --wait --vnc`
-
-## Notes
-
-* Each tool has a separate directory in the `images` directory with the build script and additional required files.
-* The tool versions (typically the commit hash) have defaulted in the Dockerfile. It can be overwritten via environment variables.
-* Only the final image is tagged; the sub-tools are not. It is still possible to build only to a certain stage (stages are defined in the Dockerfile by `FROM base_image as stage_name`).
-* The final image is called `iic-osic-tool` by default.
-* Docker on Windows suffers from bad memory management due to WSL2, especially for systems with less than 16GB RAM. As a workaround, a memory limit to WSL can be set. See [Advanced settings configuration in WSL](https://learn.microsoft.com/en-us/windows/wsl/wsl-config) (look for the key "memory" in the `wsl2` tag).
-
-## Todo
-
-n/a
+ Thank you for your cooperation!
